@@ -130,3 +130,22 @@ logs/
 node_modules/
 npm-debug.log
 yarn-error.log
+
+# Temporary scripts and build artifacts
+*.ps1
+*.bat.bak
+*.sh.bak
+dist/
+build/
+.conda/
+
+# IDE and system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Backup files
+*.bak
+*.tmp
+backup-*
