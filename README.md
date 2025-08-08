@@ -89,15 +89,33 @@ python demo.py
 git clone <your-repo>
 cd VNCagentic
 cp .env.example .env
-# Edit .env with your API keys
+# Edit .env with your API keys and provider settings
 ```
 
-2. **Run with Docker Compose**:
+2. **Configure API Provider**:
+```bash
+# For Anthropic (default)
+API_PROVIDER=anthropic
+ANTHROPIC_API_KEY=your-anthropic-key
+
+# OR for CometAPI (Anthropic-compatible, often more cost-effective)
+API_PROVIDER=comet
+COMET_API_BASE_URL=https://api.cometapi.com
+ANTHROPIC_API_KEY=your-cometapi-key
+```
+
+3. **Run with Docker Compose**:
 ```bash
 docker-compose up -d
 ```
 
-3. **Access the application**:
+4. **Test API connection**:
+```bash
+# Test your API provider setup
+python quick_test.py
+```
+
+5. **Access the application**:
 - Frontend: http://localhost:3000
 - API Documentation: http://localhost:8000/docs
 - VNC Web Interface: http://localhost:6080/vnc.html
@@ -222,6 +240,45 @@ See [SEQUENCE_DIAGRAM.md](SEQUENCE_DIAGRAM.md) for detailed sequence diagrams sh
 - Real-time message processing
 - VNC integration patterns
 - Database interaction patterns
+
+## API Provider Support
+
+### CometAPI Integration (Recommended)
+
+VNCagentic supports **CometAPI** as an Anthropic-compatible provider, offering:
+
+✅ **Cost-effective alternative** to direct Anthropic API  
+✅ **Drop-in replacement** - same interface, same functionality  
+✅ **Multiple Claude models** available  
+✅ **Enterprise-grade reliability**  
+
+#### Quick Setup with CometAPI
+
+1. **Get CometAPI Key**: Visit [CometAPI](https://api.cometapi.com) and get your API key
+2. **Configure**: Set `API_PROVIDER=comet` in your `.env` file
+3. **Test**: Run `python quick_test.py` to validate connection
+
+```bash
+# .env configuration for CometAPI
+API_PROVIDER=comet
+COMET_API_BASE_URL=https://api.cometapi.com
+ANTHROPIC_API_KEY=sk-your-cometapi-key-here
+ANTHROPIC_MODEL=claude-3-5-sonnet-20241022
+```
+
+**📖 Full Documentation**: See [docs/COMETAPI.md](docs/COMETAPI.md) for comprehensive setup guide.
+
+### Anthropic Direct API
+
+For direct Anthropic API usage:
+
+```bash
+# .env configuration for Anthropic
+API_PROVIDER=anthropic
+ANTHROPIC_API_URL=https://api.anthropic.com
+ANTHROPIC_API_KEY=your-anthropic-key-here
+ANTHROPIC_MODEL=claude-3-5-sonnet-20241022
+```
 
 ## Environment Variables
 
