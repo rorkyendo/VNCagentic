@@ -15,6 +15,7 @@ class APIProvider(StrEnum):
     ANTHROPIC = "anthropic"
     BEDROCK = "bedrock"
     VERTEX = "vertex"
+    COMET = "comet"
 
 
 async def sampling_loop(
@@ -27,6 +28,7 @@ async def sampling_loop(
     tool_output_callback: Callable[[Any, str], None],
     api_response_callback: Callable[[Any, Any, Any], None],
     api_key: str,
+    api_base_url: Optional[str] = None,
     only_n_most_recent_images: Optional[int] = None,
     max_tokens: int = 4096,
     tool_version: str = "computer_use_20250124",

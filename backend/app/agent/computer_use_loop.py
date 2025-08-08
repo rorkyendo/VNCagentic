@@ -38,12 +38,14 @@ class ComputerUseAgent:
         on_output: Callable[[str, Any], Awaitable[None]],
         on_tool_call: Callable[[str, str, Dict[str, Any], str], Awaitable[None]],
         on_tool_result: Callable[[str, str, Any, Optional[str]], Awaitable[None]],
-        on_status_update: Callable[[str, str, Optional[Dict[str, Any]]], Awaitable[None]]
+        on_status_update: Callable[[str, str, Optional[Dict[str, Any]]], Awaitable[None]],
+        api_base_url: Optional[str] = None
     ):
         self.session_id = session_id
         self.model = model
         self.api_provider = APIProvider(api_provider)
         self.api_key = api_key
+        self.api_base_url = api_base_url
         
         # Callbacks
         self.on_output = on_output
@@ -81,7 +83,8 @@ class ComputerUseAgent:
         """Initialize the agent"""
         await self.on_status_update(self.session_id, "initializing", {
             "model": self.model,
-            "api_provider": self.api_provider.value
+            "api_provider": self.api_provider.value,
+            "api_base_url": self.api_base_url
         })
         
         # Initialize tool collection (this would use the existing computer use tools)
@@ -120,6 +123,7 @@ class ComputerUseAgent:
                 tool_output_callback=self._tool_output_callback,
                 api_response_callback=self._api_response_callback,
                 api_key=self.api_key,
+                api_base_url=self.api_base_url,
                 only_n_most_recent_images=3,
                 max_tokens=settings.MAX_OUTPUT_TOKENS,
                 tool_version="computer_use_20250124"

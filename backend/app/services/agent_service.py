@@ -24,16 +24,20 @@ class AgentService:
     async def initialize_session(self, session_id: str) -> bool:
         """Initialize a new computer use agent for the session"""
         try:
+            # Determine API configuration based on provider
+            api_config = self._get_api_config()
+            
             # Create agent instance
             agent = ComputerUseAgent(
                 session_id=session_id,
-                model=settings.DEFAULT_MODEL,
+                model=settings.ANTHROPIC_MODEL,
                 api_provider=settings.API_PROVIDER,
                 api_key=settings.ANTHROPIC_API_KEY,
                 on_output=self._on_agent_output,
                 on_tool_call=self._on_tool_call,
                 on_tool_result=self._on_tool_result,
-                on_status_update=self._on_status_update
+                on_status_update=self._on_status_update,
+                api_base_url=api_config.get('base_url')
             )
             
             # Initialize agent
@@ -45,12 +49,33 @@ class AgentService:
             # Initialize websocket list for this session
             self.session_websockets[session_id] = []
             
-            logger.info(f"Agent initialized for session {session_id}")
+            logger.info(f"Agent initialized for session {session_id} with {settings.API_PROVIDER} provider")
             return True
             
         except Exception as e:
-            logger.error(f"Error initializing agent for session {session_id}: {e}")
+            logger.error(f"Failed to initialize agent for session {session_id}: {e}")
             return False
+    
+    def _get_api_config(self) -> Dict[str, str]:
+        """Get API configuration based on provider"""
+        if settings.API_PROVIDER == "comet":
+            return {
+                'base_url': settings.COMET_API_BASE_URL,
+                'auth_header': 'Authorization',
+                'auth_format': 'Bearer {}'
+            }
+        elif settings.API_PROVIDER == "anthropic":
+            return {
+                'base_url': settings.ANTHROPIC_API_URL,
+                'auth_header': 'x-api-key',
+                'auth_format': '{}'
+            }
+        else:
+            return {
+                'base_url': settings.ANTHROPIC_API_URL,
+                'auth_header': 'x-api-key', 
+                'auth_format': '{}'
+            }
     
     async def cleanup_session(self, session_id: str):
         """Clean up resources for a session"""

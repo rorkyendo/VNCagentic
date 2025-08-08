@@ -20,12 +20,16 @@ class Settings(BaseSettings):
     REDIS_URL: str = "redis://localhost:6379"
     
     # LLM Provider Configuration
-    API_PROVIDER: str = "anthropic"  # anthropic, openai, ollama
+    API_PROVIDER: str = "comet"  # comet, anthropic, openai, ollama
     
-    # Anthropic Configuration
-    ANTHROPIC_API_KEY: str = ""
+    # CometAPI Configuration (Anthropic Compatible)
+    ANTHROPIC_API_KEY: str = ""  # Used for CometAPI key
     ANTHROPIC_MODEL: str = "claude-3-5-sonnet-20241022"
     ANTHROPIC_MAX_TOKENS: int = 4096
+    COMET_API_BASE_URL: str = "https://api.cometapi.com/v1"
+    
+    # Original Anthropic Configuration
+    ANTHROPIC_API_URL: str = "https://api.anthropic.com/v1"
     
     # OpenAI Configuration (Alternative)
     OPENAI_API_KEY: str = ""
