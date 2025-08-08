@@ -1,0 +1,11 @@
+{
+  "name": "vncagentic-frontend",
+  "version": "1.0.0",
+  "description": "Simple frontend for VNCagentic API",
+  "scripts": {
+    "start": "python -m http.server 3000",
+    "dev": "python -m http.server 3000"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
