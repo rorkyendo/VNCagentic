@@ -1,0 +1,30 @@
+FROM ghcr.io/anthropics/anthropic-quickstarts:computer-use-demo-latest
+
+# Install additional dependencies for our backend integration
+RUN apt-get update && apt-get install -y \
+    redis-tools \
+    postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python packages for backend integration
+RUN pip install \
+    fastapi \
+    uvicorn \
+    aioredis \
+    psycopg2-binary
+
+# Copy our agent integration code
+COPY app/agent/ /home/computeruse/agent_integration/
+
+# Set environment variables
+ENV DISPLAY=:1
+ENV VNC_PASSWORD=vncpassword
+
+# Expose VNC and noVNC ports
+EXPOSE 5900 6080
+
+# Use the existing entrypoint but with our modifications
+COPY entrypoint_vnc.sh /entrypoint_vnc.sh
+RUN chmod +x /entrypoint_vnc.sh
+
+CMD ["/entrypoint_vnc.sh"]

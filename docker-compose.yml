@@ -1,0 +1,116 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: vncagentic
+      POSTGRES_USER: vncuser
+      POSTGRES_PASSWORD: vncpassword
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vncuser -d vncagentic"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Redis for session management
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # FastAPI Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      - DATABASE_URL=postgresql://vncuser:vncpassword@postgres:5432/vncagentic
+      - REDIS_URL=redis://redis:6379
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - API_PROVIDER=${API_PROVIDER:-anthropic}
+      - SECRET_KEY=${SECRET_KEY:-dev-secret-key}
+      - DEBUG=true
+      - VNC_PASSWORD=${VNC_PASSWORD:-vncpassword}
+      - WIDTH=${WIDTH:-1024}
+      - HEIGHT=${HEIGHT:-768}
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - vnc_data:/home/computeruse
+    privileged: true
+    restart: unless-stopped
+
+  # Computer Use Agent with VNC
+  vnc-agent:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.vnc
+    environment:
+      - DISPLAY=:1
+      - VNC_PASSWORD=${VNC_PASSWORD:-vncpassword}
+      - WIDTH=${WIDTH:-1024}
+      - HEIGHT=${HEIGHT:-768}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    ports:
+      - "5900:5900"  # VNC
+      - "6080:6080"  # noVNC web interface
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - vnc_data:/home/computeruse
+    privileged: true
+    restart: unless-stopped
+
+  # Simple Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+      - REACT_APP_WS_URL=ws://localhost:8000
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  # Nginx Reverse Proxy (optional)
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - backend
+      - frontend
+      - vnc-agent
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  vnc_data:
+
+networks:
+  default:
+    name: vncagentic-network
