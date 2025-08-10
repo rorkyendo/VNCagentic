@@ -9,7 +9,7 @@ import uuid
 from app.core.config import settings
 from app.core.redis import get_redis
 from app.schemas.websocket import WebSocketMessage, WebSocketMessageType, AgentStatusUpdate
-from app.agent.computer_use_loop import ComputerUseAgent
+from app.agent.ai_generative_agent import AIGenerativeAgent
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +18,7 @@ class AgentService:
     """Service for managing computer use agents and their sessions"""
     
     def __init__(self):
-        self.active_sessions: Dict[str, ComputerUseAgent] = {}
+        self.active_sessions: Dict[str, AIGenerativeAgent] = {}
         self.session_websockets: Dict[str, List[WebSocket]] = {}
     
     async def initialize_session(self, session_id: str) -> bool:
@@ -28,7 +28,7 @@ class AgentService:
             api_config = self._get_api_config()
             
             # Create agent instance
-            agent = ComputerUseAgent(
+            agent = AIGenerativeAgent(
                 session_id=session_id,
                 model=settings.ANTHROPIC_MODEL,
                 api_provider=settings.API_PROVIDER,
@@ -104,13 +104,20 @@ class AgentService:
     async def process_user_message(self, session_id: str, message: str):
         """Process a user message through the agent"""
         try:
+            logger.info(f"Processing user message for session {session_id}: {message[:100]}...")
+            
             if session_id not in self.active_sessions:
-                raise ValueError(f"No active agent for session {session_id}")
+                logger.warning(f"No active agent for session {session_id}, initializing...")
+                success = await self.initialize_session(session_id)
+                if not success:
+                    raise ValueError(f"Failed to initialize agent for session {session_id}")
             
             agent = self.active_sessions[session_id]
+            logger.info(f"Sending message to agent for session {session_id}")
             
             # Send message to agent
             await agent.process_message(message)
+            logger.info(f"Message processed by agent for session {session_id}")
             
         except Exception as e:
             logger.error(f"Error processing message for session {session_id}: {e}")
@@ -156,6 +163,34 @@ class AgentService:
                 except ValueError:
                     pass
     
+    async def _save_agent_response_to_db(self, session_id: str, response_text: str):
+        """Save agent response to database"""
+        try:
+            from app.core.database import get_db_session
+            from app.services.message_service import MessageService
+            from app.schemas.message import MessageCreate
+            
+            # Get database session
+            async for db in get_db_session():
+                message_service = MessageService(db)
+                
+                # Create agent message
+                agent_message = MessageCreate(
+                    content=response_text,
+                    role="assistant",
+                    message_type="agent_response",
+                    metadata={"generated_by": "mock_agent"},
+                    session_id=session_id
+                )
+                
+                # Save to database
+                await message_service.create_message(agent_message)
+                logger.info(f"Agent response saved to database for session {session_id}")
+                break
+                
+        except Exception as e:
+            logger.error(f"Error saving agent response to database: {e}")
+
     # Agent callback methods
     async def _on_agent_output(self, session_id: str, content: Any):
         """Handle agent output"""

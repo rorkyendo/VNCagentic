@@ -34,9 +34,30 @@
         
         .main-grid {
             display: grid;
-            grid-template-columns: 250px 1fr 400px;
+            grid-template-columns: 250px 1fr 350px;
             gap: 20px;
-            height: calc(100vh - 120px);
+            height: calc(100vh - 140px);
+            min-height: 600px;
+        }
+        
+        .middle-panel {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            min-height: 500px;
+        }
+        
+        .vnc-frame {
+            width: 100%;
+            flex: 1;
+            border: none;
+            border-radius: 4px;
+            min-height: 60vh;
+            height: 60vh;
+            max-height: 60vh;
         }
         
         .left-panel {
@@ -46,13 +67,7 @@
             padding: 20px;
             display: flex;
             flex-direction: column;
-        }
-        
-        .middle-panel {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            padding: 20px;
+            overflow-y: auto;
         }
         
         .right-panel {
@@ -68,6 +83,44 @@
             display: flex;
             flex-direction: column;
             flex: 1;
+            min-height: 400px;
+            max-height: 70vh;
+            height: 70vh;
+        }
+        
+        /* Responsive breakpoints */
+        @media (max-width: 1200px) {
+            .main-grid {
+                grid-template-columns: 200px 1fr 300px;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto;
+                gap: 15px;
+                height: auto;
+            }
+            
+            .left-panel,
+            .right-panel {
+                height: 300px;
+            }
+            
+            .vnc-frame {
+                height: 300px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .main-grid {
+                gap: 10px;
+            }
         }
         
         .file-panel {
@@ -110,29 +163,80 @@
             border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
+            margin-bottom: 10px;
         }
         
         .new-task-btn:hover {
             background: #218838;
         }
         
+        .clear-history-btn {
+            width: 100%;
+            padding: 8px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .clear-history-btn:hover {
+            background: #c82333;
+        }
+        
         .session-info {
             padding: 15px;
             border-bottom: 1px solid #eee;
             background: #f8f9fa;
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
         
         .messages {
             flex: 1;
             overflow-y: auto;
+            overflow-x: hidden;
             padding: 20px;
+            max-height: calc(70vh - 150px);
+            min-height: 300px;
+            scroll-behavior: smooth;
+        }
+        
+        /* Custom scrollbar for messages */
+        .messages::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .messages::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        
+        .messages::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        
+        .messages::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
         }
         
         .message {
             margin-bottom: 15px;
-            padding: 10px 15px;
-            border-radius: 8px;
-            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            max-width: 85%;
+            word-wrap: break-word;
+            line-height: 1.4;
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .message.user {
@@ -152,14 +256,115 @@
             font-style: italic;
         }
         
+        /* Real-time streaming styles */
+        .message-content {
+            margin-bottom: 5px;
+        }
+        
+        .message-details {
+            margin-top: 8px;
+            padding: 8px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .message-details pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        
+        .message-error {
+            margin-top: 5px;
+            padding: 5px 8px;
+            background: #f8d7da;
+            color: #721c24;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .message-timestamp {
+            margin-top: 5px;
+            font-size: 10px;
+            color: #666;
+            text-align: right;
+        }
+        
+        /* VNC indicator for agent activity */
+        #vnc-container iframe.agent-active {
+            border: 2px solid #4CAF50 !important;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+        }
+        
+        /* Processing indicator */
+        .processing-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            margin-left: 5px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Status updates */
+        .status.processing {
+            color: #f39c12;
+        }
+        
+        .status.connected {
+            color: #27ae60;
+        }
+        
+        .status.error {
+            color: #e74c3c;
+        }
+        
         .input-area {
-            padding: 20px;
+            padding: 15px 20px;
             border-top: 1px solid #eee;
+            background: white;
+            flex-shrink: 0;
+            position: sticky;
+            bottom: 0;
         }
         
         .input-group {
             display: flex;
             gap: 10px;
+            align-items: center;
+        }
+        
+        .scroll-indicator {
+            position: absolute;
+            bottom: 80px;
+            right: 30px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            z-index: 20;
+        }
+        
+        .scroll-indicator:hover {
+            background: #0056b3;
         }
         
         input[type="text"] {
@@ -191,7 +396,7 @@
         
         .vnc-frame {
             width: 100%;
-            height: 100%;
+            height: 50vh;
             border: none;
             border-radius: 4px;
         }
@@ -245,6 +450,7 @@
                     <!-- Task history will be populated here -->
                 </div>
                 <button id="new-task-button" class="new-task-btn">Start New Agent Task</button>
+                <button id="clear-history-button" class="clear-history-btn">🗑️ Clear History</button>
             </div>
             
             <!-- Middle Panel: VNC Connection -->
@@ -277,6 +483,8 @@
                     <div class="messages" id="messages">
                         <!-- Messages will be added here -->
                     </div>
+                    
+                    <button class="scroll-indicator" id="scroll-to-bottom" title="Scroll to bottom">↓</button>
                     
                     <div class="input-area">
                         <div class="input-group">

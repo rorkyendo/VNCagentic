@@ -44,7 +44,7 @@ class Message(Base):
     tool_use_id = Column(String(50), nullable=True)
     
     # Message metadata
-    metadata = Column(JSON, nullable=True)
+    message_metadata = Column(JSON, nullable=True)
     
     # Timestamps
     created_at = Column(DateTime(timezone=True), server_default=func.now())

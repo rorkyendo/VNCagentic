@@ -1,4 +1,4 @@
-import aioredis
+import redis.asyncio as redis
 import logging
 from typing import Optional
 
@@ -7,14 +7,14 @@ from app.core.config import settings
 logger = logging.getLogger(__name__)
 
 # Global Redis connection
-redis_client: Optional[aioredis.Redis] = None
+redis_client: Optional[redis.Redis] = None
 
 
 async def init_redis():
     """Initialize Redis connection"""
     global redis_client
     try:
-        redis_client = aioredis.from_url(
+        redis_client = redis.from_url(
             settings.REDIS_URL,
             decode_responses=True,
             retry_on_timeout=True,
@@ -28,7 +28,7 @@ async def init_redis():
         raise
 
 
-async def get_redis() -> aioredis.Redis:
+async def get_redis() -> redis.Redis:
     """Get Redis client"""
     if redis_client is None:
         await init_redis()

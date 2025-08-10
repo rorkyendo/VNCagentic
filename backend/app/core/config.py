@@ -22,11 +22,11 @@ class Settings(BaseSettings):
     # LLM Provider Configuration
     API_PROVIDER: str = "comet"  # comet, anthropic, openai, ollama
     
-    # CometAPI Configuration (Anthropic Compatible)
-    ANTHROPIC_API_KEY: str = ""  # Used for CometAPI key
-    ANTHROPIC_MODEL: str = "claude-3-5-sonnet-20241022"
-    ANTHROPIC_MAX_TOKENS: int = 4096
+    # CometAPI Configuration
     COMET_API_BASE_URL: str = "https://api.cometapi.com/v1"
+    COMET_API_KEY: str = os.getenv("COMET_API_KEY", "")
+    COMET_MODEL: str = "cometapi-3-7-sonnet"
+    COMET_MAX_TOKENS: int = 1024
     
     # Original Anthropic Configuration
     ANTHROPIC_API_URL: str = "https://api.anthropic.com/v1"
@@ -45,7 +45,6 @@ class Settings(BaseSettings):
     
     # Anthropic API
     ANTHROPIC_API_KEY: str = ""
-    API_PROVIDER: str = "anthropic"  # anthropic, bedrock, vertex
     
     # Agent Configuration
     MAX_SESSIONS: int = 10

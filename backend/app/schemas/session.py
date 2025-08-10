@@ -42,7 +42,7 @@ class SessionResponse(SessionBase):
     user_id: int
     status: SessionStatus
     vnc_details: Optional[VNCDetails] = None
-    metadata: Optional[Dict[str, Any]] = None
+    session_metadata: Optional[Dict[str, Any]] = None
     created_at: datetime
     updated_at: Optional[datetime] = None
     last_activity: Optional[datetime] = None

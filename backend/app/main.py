@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+import os
 from contextlib import asynccontextmanager
 import logging
 
@@ -57,8 +58,9 @@ app.add_middleware(
 # Include API routes
 app.include_router(api_router, prefix="/api/v1")
 
-# Mount static files (for simple frontend)
-# app.mount("/static", StaticFiles(directory="static"), name="static")
+# Mount static files (for simple frontend) if present
+if os.path.isdir("static"):
+    app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 @app.get("/")

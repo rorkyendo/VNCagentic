@@ -112,12 +112,26 @@ class SessionService:
         return await self.get_session(session_id)
     
     async def delete_session(self, session_id: str) -> bool:
-        """Delete session"""
-        stmt = delete(Session).where(Session.id == session_id)
-        result = await self.db.execute(stmt)
-        await self.db.commit()
-        
-        return result.rowcount > 0
+        """Delete session and all associated messages"""
+        try:
+            # First delete all messages for this session
+            from app.models.message import Message
+            messages_stmt = delete(Message).where(Message.session_id == session_id)
+            messages_result = await self.db.execute(messages_stmt)
+            
+            # Then delete the session
+            session_stmt = delete(Session).where(Session.id == session_id)
+            session_result = await self.db.execute(session_stmt)
+            
+            await self.db.commit()
+            
+            print(f"Deleted {messages_result.rowcount} messages and {session_result.rowcount} session for session_id: {session_id}")
+            return session_result.rowcount > 0
+            
+        except Exception as e:
+            await self.db.rollback()
+            print(f"Error deleting session {session_id}: {e}")
+            raise
     
     async def update_last_activity(self, session_id: str):
         """Update session last activity timestamp"""

@@ -22,7 +22,7 @@ class MessageService:
             role=message_data.role.value,
             message_type=message_data.message_type.value,
             content=message_data.content,
-            metadata=message_data.metadata
+            message_metadata=message_data.metadata  # Note: model field is message_metadata
         )
         
         self.db.add(message)
@@ -74,6 +74,6 @@ class MessageService:
             tool_output=message.tool_output,
             tool_use_id=message.tool_use_id,
             raw_content=message.raw_content,
-            metadata=message.metadata,
+            metadata=message.message_metadata,  # Note: model field is message_metadata
             created_at=message.created_at
         )

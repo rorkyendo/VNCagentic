@@ -38,7 +38,7 @@ class Session(Base):
     vnc_password = Column(String(50), nullable=True)
     
     # Session metadata
-    metadata = Column(JSON, nullable=True)
+    session_metadata = Column(JSON, nullable=True)
     
     # Timestamps
     created_at = Column(DateTime(timezone=True), server_default=func.now())

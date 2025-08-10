@@ -25,7 +25,13 @@ class MessageBase(BaseModel):
     metadata: Optional[Dict[str, Any]] = None
 
 
+class MessageCreateRequest(MessageBase):
+    """Schema for creating a message via API endpoint (without session_id)"""
+    role: MessageRole = MessageRole.USER
+
+
 class MessageCreate(MessageBase):
+    """Schema for creating a message in service layer (with session_id)"""
     role: MessageRole = MessageRole.USER
     session_id: str
 

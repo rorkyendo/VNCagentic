@@ -39,8 +39,8 @@ services:
     environment:
       - DATABASE_URL=postgresql://vncuser:vncpassword@postgres:5432/vncagentic
       - REDIS_URL=redis://redis:6379
-      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
-      - API_PROVIDER=${API_PROVIDER:-anthropic}
+      - COMET_API_KEY=${COMET_API_KEY}
+      - API_PROVIDER=${API_PROVIDER:-comet}
       - SECRET_KEY=${SECRET_KEY:-dev-secret-key}
       - DEBUG=true
       - VNC_PASSWORD=${VNC_PASSWORD:-vncpassword}
@@ -56,6 +56,7 @@ services:
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - vnc_data:/home/computeruse
+      - /var/run/docker.sock:/var/run/docker.sock:rw
     privileged: true
     restart: unless-stopped
 
@@ -69,10 +70,10 @@ services:
       - VNC_PASSWORD=${VNC_PASSWORD:-vncpassword}
       - WIDTH=${WIDTH:-1024}
       - HEIGHT=${HEIGHT:-768}
-      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
     ports:
       - "5900:5900"  # VNC
       - "6080:6080"  # noVNC web interface
+      - "8090:8090"  # VNC executor API
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - vnc_data:/home/computeruse

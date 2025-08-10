@@ -1,30 +1,51 @@
 FROM ghcr.io/anthropics/anthropic-quickstarts:computer-use-demo-latest
 
-# Install additional dependencies for our backend integration
+# Switch to root to install packages
+USER root
+
+# Install additional dependencies for automation
 RUN apt-get update && apt-get install -y \
     redis-tools \
     postgresql-client \
+    xdotool \
+    imagemagick \
+    x11-apps \
+    firefox-esr \
+    curl \
+    wget \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python packages for backend integration
 RUN pip install \
     fastapi \
     uvicorn \
-    aioredis \
-    psycopg2-binary
+    pydantic \
+    pillow \
+    numpy
 
 # Copy our agent integration code
 COPY app/agent/ /home/computeruse/agent_integration/
+COPY vnc_api.py /home/computeruse/vnc_api.py
+
+# Copy entrypoint script and set permissions as root
+COPY entrypoint_vnc.sh /entrypoint_vnc.sh
+RUN chmod +x /entrypoint_vnc.sh
+
+# Fix ownership of copied files
+RUN chown -R computeruse:computeruse /home/computeruse/vnc_api.py
+
+# Switch back to computeruse user
+USER computeruse
 
 # Set environment variables
 ENV DISPLAY=:1
 ENV VNC_PASSWORD=vncpassword
 
+# Ensure required Python packages are installed for the computeruse user (pyenv environment)
+RUN pip install --user fastapi uvicorn pydantic pillow numpy || true
+
 # Expose VNC and noVNC ports
-EXPOSE 5900 6080
+EXPOSE 5900 6080 8090
 
-# Use the existing entrypoint but with our modifications
-COPY entrypoint_vnc.sh /entrypoint_vnc.sh
-RUN chmod +x /entrypoint_vnc.sh
-
-CMD ["/entrypoint_vnc.sh"]
+# Use the entrypoint script
+ENTRYPOINT ["/entrypoint_vnc.sh"]
