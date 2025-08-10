@@ -141,12 +141,31 @@ docker-compose -f docker-compose.prod.yml up --scale backend=3 -d
 # Check all container health
 docker-compose ps
 
+# Verify VNC API server is running
+curl -X POST http://localhost:8090/execute \
+  -H "Content-Type: application/json" \
+  -d '{"command":"echo VNC API is working"}'
+
 # View real-time logs
 docker-compose logs -f backend
 docker-compose logs -f vnc-agent
 
 # Monitor resource usage
 docker stats
+```
+
+### VNC Services Verification
+```bash
+# Check VNC desktop access
+curl -I http://localhost:6080/vnc.html
+
+# Test VNC API endpoint
+curl -X POST http://localhost:8090/execute \
+  -H "Content-Type: application/json" \
+  -d '{"command":"DISPLAY=:1 xdotool key Return"}'
+
+# Verify all ports are accessible
+netstat -tulpn | grep -E "(5900|6080|8090)"
 ```
 
 ### Service Management
@@ -358,12 +377,29 @@ asyncio.run(test())
 
 #### VNC Agent Issues
 ```bash
-# Restart VNC API server
+# Check VNC API server status
+docker-compose exec vnc-agent bash -c "curl -f http://localhost:8090/execute -X POST -H 'Content-Type: application/json' -d '{\"command\":\"echo test\"}'"
+
+# Restart VNC API server manually if needed
 docker-compose exec vnc-agent bash -c "pkill -f vnc_api.py; cd /home/computeruse && python3 vnc_api.py &"
+
+# Check if VNC API port is listening
+docker-compose exec vnc-agent netstat -tulpn | grep 8090
 
 # Check X11 display
 docker-compose exec vnc-agent bash -c "DISPLAY=:1 xdpyinfo"
+
+# View VNC API logs
+docker-compose logs vnc-agent | grep "VNC Command API"
+
+# Verify all VNC services are running
+docker-compose exec vnc-agent ps aux | grep -E "(Xvfb|x11vnc|vnc_api)"
 ```
+
+**Common VNC API Issues:**
+- **Port 8090 not accessible**: Check if vnc_api.py process is running
+- **Commands not executing**: Verify DISPLAY=:1 environment variable
+- **Container startup issues**: Check entrypoint script permissions
 
 ### Performance Optimization
 

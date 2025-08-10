@@ -89,6 +89,25 @@ http://localhost:3000
 http://localhost:6080
 ```
 - Live desktop view in your browser
+- Visual confirmation of command execution
+- Direct interaction with applications
+
+### VNC API (Direct Command Execution)
+```
+http://localhost:8090/execute
+```
+- Direct HTTP API for command execution
+- Used internally by the backend
+- Test endpoint for debugging
+
+### Backend API Documentation
+```
+http://localhost:8000/docs
+```
+- Interactive API documentation
+- Test endpoints directly
+- View request/response schemas
+- Live desktop view in your browser
 - See applications open and close in real-time
 - Visual feedback for all commands
 

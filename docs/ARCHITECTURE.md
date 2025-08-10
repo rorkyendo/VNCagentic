@@ -133,15 +133,28 @@ backend/
 **Architecture**:
 ```python
 vnc-agent/
-├── vnc_api.py          # Command execution HTTP API
-├── entrypoint.sh       # Container initialization
-├── Dockerfile          # Container definition
+├── vnc_api.py          # HTTP server for command execution (port 8090)
+├── entrypoint_vnc.sh   # Container startup script
+├── Dockerfile.vnc      # Container definition
 └── applications/       # Desktop applications
-    ├── firefox-esr
-    ├── xcalc
-    ├── gedit
-    └── xterm
+    ├── firefox-esr     # Web browser
+    ├── xcalc          # Calculator
+    ├── gedit          # Text editor
+    └── xterm          # Terminal
 ```
+
+**VNC API Server** (`vnc_api.py`):
+- **Port**: 8090
+- **Protocol**: HTTP REST API
+- **Purpose**: Execute xdotool commands in VNC environment
+- **Endpoints**:
+  - `POST /execute` - Execute shell commands
+  - `POST /screenshot` - Capture desktop screenshot
+- **Features**:
+  - Command validation and error handling
+  - CORS support for web integration
+  - Environment variable management (DISPLAY=:1)
+  - Process execution with timeout protection
 
 ### Database Layer
 **Technology**: PostgreSQL 15 with asyncpg  

@@ -48,4 +48,4 @@ RUN pip install --user fastapi uvicorn pydantic pillow numpy || true
 EXPOSE 5900 6080 8090
 
 # Use the entrypoint script
-ENTRYPOINT ["/entrypoint_vnc.sh"]
+ENTRYPOINT ["/bin/bash", "/entrypoint_vnc.sh"]
