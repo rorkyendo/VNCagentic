@@ -1080,4 +1080,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **VNCagentic** - Bringing natural language control to desktop environments through pure AI generation.
 
-*Built with ❤️ by [Taufiq Rorkyendo](https://github.com/rorkyendo) for the CambioML Senior Backend DevOps Engineer Challenge.*
+*Built with ❤️ by [Taufiq Rorkyendo](https://github.com/rorkyendo).*
