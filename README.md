@@ -4,7 +4,7 @@
 
 **Demo Video : [Watch Video](https://www.canva.com/design/DAGv0Gd930Q/aNu3VYay6GZprOGW4xns8w/watch?utm_content=DAGv0Gd930Q&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h62903edf47)**
 
-**Challenge: CambioML Senior Backend DevOps Engineer - Claude Computer Use**
+**Claude Computer Use**
 
 A clean, minimal, production-ready LLM-driven agent for controlling VNC/X11 desktop environments through natural language commands. Built with FastAPI, PostgreSQL, and Docker for scalable deployment.
 
